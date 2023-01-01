@@ -8,29 +8,35 @@ import javax.validation.constraints.*;
 
 
 @JsonPropertyOrder({"id", "title", "text", "options", "answer"})
-//@Entity
-//@Table(name = "quiz")
+@Entity
+@Table(name = "quiz")
 public class Quiz {
     @JsonProperty("id")
-    private int generatedId;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private long generatedId;
     @NotEmpty
     @JsonProperty
+    @Column
     private String title;
     @NotEmpty
     @JsonProperty
+    @Column
     private String text;
     @NotNull
     @Size(min=2, message = "options should contain at least two possible answers")
     @JsonProperty
+    @Column
     private String[] options;
 
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) //means answer will not be deserialized from json to a field in the class.
-    private int[] answer; // contd: it's serialized when it's being written to json though hence it's availability as compared to ignore.
+    @Column                                                 // contd: it's serialized when it's being written to json though hence it's availability as compared to ignore.
+    private int[] answer;
 
     public Quiz() {}
 
     public Quiz(String title, String text, String[] options, int[] answer) {
-        int id = generatedId;
+        long id = generatedId;
         this.title = title;
         this.text = text;
         this.options = options;
@@ -38,7 +44,7 @@ public class Quiz {
     }
 
 
-    public int id() {
+    public long id() {
         return generatedId;
     }
 
@@ -58,8 +64,5 @@ public class Quiz {
         return answer;
     }
 
-    public void setId(int id) {
-        generatedId = id;
-    }
 }
 
