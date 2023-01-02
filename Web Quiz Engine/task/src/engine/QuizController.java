@@ -11,8 +11,12 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 public class QuizController {
-    @Autowired //if removed, code doesn't work.
+
     QuizService quizService;
+    @Autowired
+    public QuizController(QuizService quizService) {
+        this.quizService = quizService;
+    }
     public record AnswerCheck(boolean success, String feedback) {}
     public record Answer(int[] answer) {}
     AnswerCheck correctAnswer = new AnswerCheck(true, "Congratulations, you are right!");
@@ -43,7 +47,7 @@ public class QuizController {
         }
     }
 
-    @DeleteMapping("quizzes")
+    @DeleteMapping("/quizzes")
     public void deleteAllQuizzes() {
         quizService.deleteAllQuizzes();
         System.out.println("All quizzes deleted");

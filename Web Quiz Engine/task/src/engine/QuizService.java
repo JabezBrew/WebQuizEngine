@@ -29,5 +29,6 @@ public class QuizService {
     public void deleteAllQuizzes() {
         quizRepository.deleteAll();
     }
+
 }
 

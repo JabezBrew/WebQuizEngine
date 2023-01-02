@@ -28,7 +28,6 @@ public class Quiz {
     @JsonProperty
     @Column
     private String[] options;
-
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY) //means answer will not be deserialized from json to a field in the class.
     @Column                                                 // contd: it's serialized when it's being written to json though hence it's availability as compared to ignore.
     private int[] answer;
