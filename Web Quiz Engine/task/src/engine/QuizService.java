@@ -15,7 +15,7 @@ public class QuizService {
     }
 
     public Quiz getQuizById(long id) {
-        return quizRepository.findById(id).orElseThrow(QuizNotFoundException::new);
+        return quizRepository.findById(id).orElseThrow(NotFoundException::new);
     }
 
     public Quiz saveQuiz(Quiz quizToSave) {
