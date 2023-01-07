@@ -20,9 +20,13 @@ public class UserController {
 
     @PostMapping("/api/register")
     public void registerUser(@Valid @RequestBody User user) {
-        user.setPassword(encoder.encode(user.getPassword())); //setting password to encoded password
-        userRepo.save(user);
-        System.out.println("User registered");
+        if (userRepo.findByEmail(user.getEmail()) != null) { //checking if user with this email already exists
+            throw new UserAlreadyExistsException();
+        } else {
+            user.setPassword(encoder.encode(user.getPassword())); //setting password to encoded password
+            userRepo.save(user);
+            System.out.println("User registered");
+        }
     }
 
     @GetMapping("/api/users")
