@@ -23,7 +23,7 @@ public class Quiz {
     @JsonProperty("id")
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private long generatedId;
+    private long id;
     
     @NotEmpty
     @JsonProperty

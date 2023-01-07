@@ -1,13 +1,16 @@
 package engine;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.Arrays;
-import java.util.List;
+import java.util.Date;
 import java.util.Objects;
 
 
@@ -16,9 +19,12 @@ import java.util.Objects;
 public class QuizController {
 
     QuizService quizService;
+
+    CompletedQuizRepository completedQuizRepo;
     @Autowired
-    public QuizController(QuizService quizService) {
+    public QuizController(QuizService quizService, CompletedQuizRepository completedQuizRepo) {
         this.quizService = quizService;
+        this.completedQuizRepo = completedQuizRepo;
     }
     public record AnswerCheck(boolean success, String feedback) {}
     public record Answer(int[] answer) {}
@@ -26,13 +32,53 @@ public class QuizController {
     AnswerCheck wrongAnswer = new AnswerCheck(false, "Wrong answer! Please try again.");
 
     @GetMapping("/quizzes")
-    public List<Quiz> getQuizzes() {
-        return quizService.getAllQuizzes();
+    public Page<Quiz> getQuizzes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize,
+            Authentication auth) {
+
+        UserDetailsImpl currentUser = (UserDetailsImpl) auth.getPrincipal();
+        Long userId = currentUser.getId();
+
+        int x = 1;
+        int totalElement = (int) completedQuizRepo.countByUserId(userId);
+
+        if (page == 0) {
+            x = 0;
+        }else if (totalElement > 10){
+            page = totalElement / pageSize + 1;
+        }
+
+        PageRequest request = PageRequest.of(page - x, pageSize);
+        return quizService.findAllQuizzes(request);
     }
 
     @GetMapping("/quizzes/{id}")
     public Quiz getQuiz(@PathVariable int id) {
         return quizService.getQuizById(id);
+    }
+
+    @GetMapping("/quizzes/completed")
+    public Page<CompletedQuiz> getCompletedQuizzes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int pageSize,
+            @RequestParam(defaultValue = "completedAt") String sortBy,
+            Authentication auth) {
+
+        UserDetailsImpl currentUser = (UserDetailsImpl) auth.getPrincipal();
+        Long userId = currentUser.getId();
+
+        int x = 1;
+        int totalElement = (int) completedQuizRepo.countByUserId(userId);
+
+        if (page == 0) {
+            x = 0;
+        }else if (totalElement > 10){
+            page = totalElement / pageSize + 1;
+        }
+
+        PageRequest request = PageRequest.of(page - x, pageSize, Sort.by(sortBy).descending().and(Sort.by("id").descending()));
+        return completedQuizRepo.findQuizzesCompletedByUser(userId, request);
     }
 
     @PostMapping("/quizzes")
@@ -47,12 +93,16 @@ public class QuizController {
     }
 
     @PostMapping("/quizzes/{id}/solve")
-    public AnswerCheck postAnswer(@PathVariable int id, @Valid  @RequestBody Answer answer) {
+    public AnswerCheck postAnswer(@PathVariable int id, @Valid  @RequestBody Answer answer, Authentication auth) {
         Quiz quiz = quizService.getQuizById(id);
-        if (quiz.getAnswer() == null && answer.answer().length == 0) {
+        if (quiz.getAnswer() == null && answer.answer().length == 0 || Arrays.equals(quiz.getAnswer(), answer.answer())) {
+            UserDetailsImpl currentUser = (UserDetailsImpl) auth.getPrincipal();
+            Long userId = currentUser.getId();
+            completedQuizRepo.save(
+                    new CompletedQuiz( (long) id, userId, new Date() ) );
             return correctAnswer;
         } else {
-            return Arrays.equals(answer.answer(), quiz.getAnswer()) ? correctAnswer : wrongAnswer;
+            return wrongAnswer;
         }
     }
 

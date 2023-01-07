@@ -1,6 +1,8 @@
 package engine;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -18,18 +20,17 @@ public class QuizService {
         return quizRepository.findById(id).orElseThrow(NotFoundException::new);
     }
 
-    public Quiz saveQuiz(Quiz quizToSave) {
-        return quizRepository.save(quizToSave);
+    public Page<Quiz> findAllQuizzes(PageRequest request) {
+        return quizRepository.findAll(request);
     }
 
-    public List<Quiz> getAllQuizzes() {
-        return (List<Quiz>) quizRepository.findAll();
+    public Quiz saveQuiz(Quiz quizToSave) {
+        return quizRepository.save(quizToSave);
     }
 
     public void deleteAllQuizzes() {
         quizRepository.deleteAll();
     }
-
 
     public void deleteQuiz(int id) {
         quizRepository.deleteById((long) id);
