@@ -1,5 +1,6 @@
-package engine;
+package engine.repos;
 
+import engine.entities.User;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 

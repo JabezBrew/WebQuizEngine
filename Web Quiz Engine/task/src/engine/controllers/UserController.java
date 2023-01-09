@@ -1,5 +1,8 @@
-package engine;
+package engine.controllers;
 
+import engine.exceptions.UserAlreadyExistsException;
+import engine.repos.UserRepository;
+import engine.entities.User;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;

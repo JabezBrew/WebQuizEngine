@@ -1,11 +1,12 @@
-package engine;
+package engine.services;
 
+import engine.entities.Quiz;
+import engine.exceptions.NotFoundException;
+import engine.repos.QuizRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class QuizService {

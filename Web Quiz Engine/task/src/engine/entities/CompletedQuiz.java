@@ -1,4 +1,4 @@
-package engine;
+package engine.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;

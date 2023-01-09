@@ -1,5 +1,6 @@
-package engine;
+package engine.entities;
 
+import engine.entities.Quiz;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

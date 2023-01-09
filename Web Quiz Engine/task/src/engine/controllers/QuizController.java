@@ -1,5 +1,12 @@
-package engine;
+package engine.controllers;
 
+import engine.exceptions.ForbiddenException;
+import engine.services.QuizService;
+import engine.security.UserDetailsImpl;
+import engine.entities.CompletedQuiz;
+import engine.entities.Quiz;
+import engine.entities.User;
+import engine.repos.CompletedQuizRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
