@@ -12,7 +12,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -41,11 +40,9 @@ public class QuizController {
     @GetMapping("/quizzes")
     public Page<Quiz> getQuizzes(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int pageSize,
-            Authentication auth) {
+            @RequestParam(defaultValue = "10") int pageSize) {
 
-        UserDetailsImpl currentUser = (UserDetailsImpl) auth.getPrincipal();
-        Long userId = currentUser.getId();
+        Long userId = UserDetailsImpl.getCurrentUserID();
 
         int x = 1;
         int totalElement = (int) completedQuizRepo.countByUserId(userId);
@@ -69,12 +66,9 @@ public class QuizController {
     public Page<CompletedQuiz> getCompletedQuizzes(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(defaultValue = "completedAt") String sortBy,
-            Authentication auth) {
+            @RequestParam(defaultValue = "completedAt") String sortBy) {
 
-        UserDetailsImpl currentUser = (UserDetailsImpl) auth.getPrincipal();
-        Long userId = currentUser.getId();
-
+        Long userId = UserDetailsImpl.getCurrentUserID();
         int x = 1;
         int totalElement = (int) completedQuizRepo.countByUserId(userId);
 
@@ -89,9 +83,8 @@ public class QuizController {
     }
 
     @PostMapping("/quizzes")
-    public Quiz postQuiz(@Valid @RequestBody Quiz quiz, Authentication auth) {
-        UserDetailsImpl currentUser = (UserDetailsImpl) auth.getPrincipal();
-        Long userId = currentUser.getId();
+    public Quiz postQuiz(@Valid @RequestBody Quiz quiz) {
+        Long userId = UserDetailsImpl.getCurrentUserID();
         User user = new User();
         user.setId(userId);
         quiz.setUser(user);
@@ -100,11 +93,10 @@ public class QuizController {
     }
 
     @PostMapping("/quizzes/{id}/solve")
-    public AnswerCheck postAnswer(@PathVariable int id, @Valid  @RequestBody Answer answer, Authentication auth) {
+    public AnswerCheck postAnswer(@PathVariable int id, @Valid  @RequestBody Answer answer) {
         Quiz quiz = quizService.getQuizById(id);
         if (quiz.getAnswer() == null && answer.answer().length == 0 || Arrays.equals(quiz.getAnswer(), answer.answer())) {
-            UserDetailsImpl currentUser = (UserDetailsImpl) auth.getPrincipal();
-            Long userId = currentUser.getId();
+            Long userId = UserDetailsImpl.getCurrentUserID();
             completedQuizRepo.save(
                     new CompletedQuiz( (long) id, userId, new Date() ) );
             return correctAnswer;
@@ -120,9 +112,8 @@ public class QuizController {
     }
 
     @DeleteMapping("/quizzes/{id}")
-    public ResponseEntity<Quiz> deleteQuiz(@PathVariable int id, Authentication auth) {
-        UserDetailsImpl currentUser = (UserDetailsImpl) auth.getPrincipal();
-        Long userId = currentUser.getId();
+    public ResponseEntity<Quiz> deleteQuiz(@PathVariable int id) {
+        Long userId = UserDetailsImpl.getCurrentUserID();
         Quiz quiz = quizService.getQuizById(id);
         if (Objects.equals(quiz.getUser().getId(), userId)) {
             quizService.deleteQuiz(id);

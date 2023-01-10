@@ -1,8 +1,10 @@
 package engine.security;
 
 import engine.entities.User;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
@@ -38,6 +40,12 @@ public class UserDetailsImpl implements UserDetails {
 
     public Long getId() {
         return id;
+    }
+
+    public static Long getCurrentUserID() {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        UserDetailsImpl currentUser = (UserDetailsImpl) auth.getPrincipal();
+        return currentUser.getId();
     }
 
     @Override
