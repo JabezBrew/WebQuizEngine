@@ -48,6 +48,12 @@ public class UserDetailsImpl implements UserDetails {
         return currentUser.getId();
     }
 
+    public static User getCurrentUser() {
+        User user = new User();
+        user.setId(getCurrentUserID());
+        return user;
+    }
+
     @Override
     public boolean isAccountNonExpired() {
         return true;
